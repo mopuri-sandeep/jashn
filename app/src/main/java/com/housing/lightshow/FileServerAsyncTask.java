@@ -39,6 +39,8 @@ public class FileServerAsyncTask extends AsyncTask {
             ServerSocket serverSocket = new ServerSocket(8888);
             Socket client = serverSocket.accept();
 
+            System.out.println("laddha >>>>>>>>>>>>>>>>>> " + client.getInetAddress().toString());
+
             /**
              * If this code is reached, a server has connected and transferred data
              * Save the input stream from the server as a JPEG file

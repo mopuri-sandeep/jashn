@@ -3,10 +3,14 @@ package com.housing.lightshow;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+
+import java.net.InetAddress;
 
 
 /**
@@ -103,7 +107,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                                         @Override
                                         public void onSuccess() {
                                             System.out.println("device connected");
-                                                (new FileServerAsyncTask()).execute(1,2,3);
+//                                            (new FileServerAsyncTask()).execute(1, 2, 3);
+                                            (new ServerHandler("127.0.0.1")).execute(1,2,3);
 //                                            (new ServerHandler("host")).execute(1, 2, 3);
                                             //success logic
                                         }
@@ -141,7 +146,24 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             // Call WifiP2pManager.requestPeers() to get a list of current peers
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
-            // Respond to new connection or disconnections
+            System.out.println("Laddhaaaaaassssssttttt .>>>>>>>>>>>");
+            NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+            if (networkInfo.isConnected()) {
+                System.out.println("the network info is" + networkInfo.toString());
+                mManager.requestConnectionInfo(mChannel, new WifiP2pManager.ConnectionInfoListener() {
+                    @Override
+                    public void onConnectionInfoAvailable(WifiP2pInfo info) {
+                        InetAddress ownerAddress = info.groupOwnerAddress;
+                        System.out.println("The server address is : " + ownerAddress.getHostAddress());
+                        System.out.println("device connected");
+//                                            (new FileServerAsyncTask()).execute(1, 2, 3);
+                        (new ServerHandler("127.0.0.1")).execute(1, 2, 3);
+                        System.out.println("All things done");
+                    }
+                });
+            } else {
+                //disconnected
+            }
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
             // Respond to this device's wifi state changing
         }
