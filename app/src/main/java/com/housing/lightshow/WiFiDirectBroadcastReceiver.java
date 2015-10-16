@@ -90,8 +90,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                                 myPeerListListener = new WifiP2pManager.PeerListListener() {
                                     @Override
                                     public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
-                                        System.out.println("printing device list");
-                                        System.out.println(wifiP2pDeviceList.toString());
+                                        System.out.println("getlist => " + wifiP2pDeviceList.getDeviceList().toString());
+                                        System.out.println("printing device list => " + wifiP2pDeviceList.toString());
                                     }
                                 };
 
