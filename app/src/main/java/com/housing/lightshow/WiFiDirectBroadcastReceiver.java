@@ -102,6 +102,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                                             @Override
                                             public void onSuccess() {
                                                 System.out.println("device connected");
+                                                (new FileServerAsyncTask()).execute(1,2,3);
                                                 //success logic
                                             }
 
