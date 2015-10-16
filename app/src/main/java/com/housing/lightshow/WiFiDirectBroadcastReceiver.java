@@ -91,9 +91,32 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                                     @Override
                                     public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
                                         System.out.println("getlist => " + wifiP2pDeviceList.getDeviceList().toString());
-                                        System.out.println("printing device list => " + wifiP2pDeviceList.toString());
+                                        System.out.println("printing device list => " + wifiP2pDeviceList.getDeviceList().size());
+
+                                        WifiP2pDevice device = wifiP2pDeviceList.getDeviceList().iterator().next();
+                                        WifiP2pConfig config = new WifiP2pConfig();
+                                        config.deviceAddress = device.deviceAddress;
+                                        System.out.println("device name => " + device.deviceName);
+                                        mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+
+                                            @Override
+                                            public void onSuccess() {
+                                                System.out.println("device connected");
+                                                //success logic
+                                            }
+
+                                            @Override
+                                            public void onFailure(int reason) {
+                                                System.out.println("device could not connected");
+                                                //failure logic
+                                            }
+                                        });
+
+
+
                                     }
                                 };
+
 
                                 mManager.requestPeers(mChannel, myPeerListListener);
                             }
