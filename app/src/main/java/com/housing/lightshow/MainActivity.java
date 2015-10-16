@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.content.Intent;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -16,6 +17,7 @@ public class MainActivity extends ActionBarActivity {
     WifiP2pManager.Channel mChannel;
     BroadcastReceiver mReceiver;
     IntentFilter mIntentFilter;
+    WifiP2pManager.PeerListListener myPeerListListener;
 
 
     @Override
@@ -32,7 +34,32 @@ public class MainActivity extends ActionBarActivity {
         mChannel = mManager.initialize(this, getMainLooper(), null);
         mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
         registerReceiver(mReceiver, mIntentFilter);
+//        mReceiver.discoveringPeers
         System.out.println("laddha loading filters>>>>");
+
+//        mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+//            @Override
+//            public void onSuccess() {
+//                System.out.println("peer discovered successfull");
+//                String action = intent.getAction();
+//                if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
+//
+//                    // request available peers from the wifi p2p manager. This is an
+//                    // asynchronous call and the calling activity is notified with a
+//                    // callback on PeerListListener.onPeersAvailable()
+//                    if (mManager != null) {
+//                        mManager.requestPeers(mChannel, myPeerListListener);
+//                    }
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onFailure(int reasonCode) {
+//                System.out.println("peer discovered unsuccessfull");
+//            }
+//        });
+
     }
 
     @Override
@@ -69,5 +96,4 @@ public class MainActivity extends ActionBarActivity {
         super.onPause();
         unregisterReceiver(mReceiver);
     }
-
 }
