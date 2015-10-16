@@ -95,7 +95,9 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
                                         WifiP2pDevice device = wifiP2pDeviceList.getDeviceList().iterator().next();
                                         WifiP2pConfig config = new WifiP2pConfig();
+
                                         config.deviceAddress = device.deviceAddress;
+                                        System.out.println("device address => " + device.deviceAddress.toString());
                                         System.out.println("device name => " + device.deviceName);
                                         mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
 
