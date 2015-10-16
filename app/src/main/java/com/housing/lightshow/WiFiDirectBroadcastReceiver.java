@@ -9,7 +9,6 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 
 
-
 /**
  * Created by Akshay on 16/10/15.
  */
@@ -45,7 +44,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         });
     }
 
-    public void connectToPeer(){
+    public void connectToPeer() {
         //obtain a peer from the WifiP2pDeviceList
         WifiP2pDevice device = new WifiP2pDevice();
         WifiP2pConfig config = new WifiP2pConfig();
@@ -82,47 +81,47 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     public void onSuccess() {
                         System.out.println("peer discovered successfull");
 
-                            // request available peers from the wifi p2p manager. This is an
-                            // asynchronous call and the calling activity is notified with a
-                            // callback on PeerListListener.onPeersAvailable()
+                        // request available peers from the wifi p2p manager. This is an
+                        // asynchronous call and the calling activity is notified with a
+                        // callback on PeerListListener.onPeersAvailable()
 
-                            if (mManager != null) {
-                                myPeerListListener = new WifiP2pManager.PeerListListener() {
-                                    @Override
-                                    public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
-                                        System.out.println("getlist => " + wifiP2pDeviceList.getDeviceList().toString());
-                                        System.out.println("printing device list => " + wifiP2pDeviceList.getDeviceList().size());
+                        if (mManager != null) {
+                            myPeerListListener = new WifiP2pManager.PeerListListener() {
+                                @Override
+                                public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
+                                    System.out.println("getlist => " + wifiP2pDeviceList.getDeviceList().toString());
+                                    System.out.println("printing device list => " + wifiP2pDeviceList.getDeviceList().size());
 
-                                        WifiP2pDevice device = wifiP2pDeviceList.getDeviceList().iterator().next();
-                                        WifiP2pConfig config = new WifiP2pConfig();
+                                    WifiP2pDevice device = wifiP2pDeviceList.getDeviceList().iterator().next();
+                                    WifiP2pConfig config = new WifiP2pConfig();
 
-                                        config.deviceAddress = device.deviceAddress;
-                                        System.out.println("device address => " + device.deviceAddress.toString());
-                                        System.out.println("device name => " + device.deviceName);
-                                        mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+                                    config.deviceAddress = device.deviceAddress;
+                                    System.out.println("device address => " + device.deviceAddress.toString());
+                                    System.out.println("device name => " + device.deviceName);
+                                    mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
 
-                                            @Override
-                                            public void onSuccess() {
-                                                System.out.println("device connected");
+                                        @Override
+                                        public void onSuccess() {
+                                            System.out.println("device connected");
                                                 (new FileServerAsyncTask()).execute(1,2,3);
-                                                //success logic
-                                            }
+//                                            (new ServerHandler("host")).execute(1, 2, 3);
+                                            //success logic
+                                        }
 
-                                            @Override
-                                            public void onFailure(int reason) {
-                                                System.out.println("device could not connected");
-                                                //failure logic
-                                            }
-                                        });
-
-
-
-                                    }
-                                };
+                                        @Override
+                                        public void onFailure(int reason) {
+                                            System.out.println("device could not connected");
+                                            //failure logic
+                                        }
+                                    });
 
 
-                                mManager.requestPeers(mChannel, myPeerListListener);
-                            }
+                                }
+                            };
+
+
+                            mManager.requestPeers(mChannel, myPeerListListener);
+                        }
                     }
 
                     @Override
@@ -130,7 +129,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                         System.out.println("peer discovered unsuccessfull");
                     }
                 });
-
 
 
             } else {

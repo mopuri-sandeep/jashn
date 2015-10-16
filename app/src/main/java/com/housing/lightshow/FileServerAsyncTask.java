@@ -4,15 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -23,11 +19,13 @@ public class FileServerAsyncTask extends AsyncTask {
 
     private Context context;
     private TextView statusText;
+    String host;
 
-//    public FileServerAsyncTask(Context context, View statusText) {
+//    public FileServerAsyncTask(Contedxt context, View statusText) {
     public FileServerAsyncTask() {
 //        this.context = context;
 //        this.statusText = (TextView) statusText;
+        host = "10.1.2.60";
     }
 
     @Override
@@ -38,6 +36,59 @@ public class FileServerAsyncTask extends AsyncTask {
              * Create a server socket and wait for client connections. This
              * call blocks until a connection is accepted from a client
              */
+            ServerSocket serverSocket = new ServerSocket(8888);
+            Socket client = serverSocket.accept();
+
+            /**
+             * If this code is reached, a server has connected and transferred data
+             * Save the input stream from the server as a JPEG file
+             */
+            /*
+            final File f = new File(Environment.getExternalStorageDirectory() + "/"
+                    + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis()
+                    + ".jpg");
+
+            File dirs = new File(f.getParent());
+            if (!dirs.exists())
+                dirs.mkdirs();
+            f.createNewFile();
+            InputStream inputstream = client.getInputStream();
+
+            FileOutputStream os = new FileOutputStream(f);
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputstream.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+            os.close();
+//            copyFile(inputstream, new FileOutputStream(f));
+             */
+
+            InputStream inputstream = client.getInputStream();
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputstream.read(buffer)) > 0) {
+                System.out.println("laddha >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> hi");
+                System.out.println(buffer.toString());
+            }
+            serverSocket.close();
+            return true;
+//            return f.getAbsolutePath();
+        } catch (IOException e) {
+            Log.e("WiFiDirectActivity", e.getMessage());
+            return null;
+        }
+
+
+
+
+        /*try {
+
+            *//**
+             * Create a server socket and wait for client connections. This
+             * call blocks until a connection is accepted from a client
+             *//*
             ServerSocket serverSocket = new ServerSocket(8888);
             Socket client = null;
             try {
@@ -58,10 +109,10 @@ public class FileServerAsyncTask extends AsyncTask {
             }
 
 
-            /**
+            *//**
              * If this code is reached, a client has connected and transferred data
              * Save the input stream from the client as a JPEG file
-             */
+             *//*
             final File f = new File(Environment.getExternalStorageDirectory() + "/"
                     + context.getPackageName() + "/wifip2pshared-" + System.currentTimeMillis()
                     + ".jpg");
@@ -85,7 +136,7 @@ public class FileServerAsyncTask extends AsyncTask {
         } catch (IOException e) {
             Log.e("WiFiDirectActivity", e.getMessage());
             return null;
-        }
+        }*/
     }
 
 //    @Override
