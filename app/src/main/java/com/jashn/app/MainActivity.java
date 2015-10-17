@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -30,7 +32,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Timer;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.TimerTask;
 
 public class MainActivity extends Activity {
@@ -100,25 +103,71 @@ public class MainActivity extends Activity {
     private Thread mLoadSoundFileThread;
     private Thread mRecordAudioThread;
     private Thread mSaveSoundFileThread;
-    private Boolean master = false;
+    private static Boolean master = false;
     Button button;
-    String filePath;
+    static String filePath;
+    static ArrayList<Integer> amplitudes;
 
+    static LinearLayout background;
 
+    public static int[] colors = {
+            Color.rgb(224, 124, 0),
+            Color.rgb(42, 212, 0),
+            Color.rgb(0, 207, 44),
+            Color.rgb(229, 31, 0),
+            Color.rgb(220, 213, 0),
+            Color.rgb(0, 105, 195),
+            Color.rgb(133, 216, 0),
+            Color.rgb(0, 203, 128),
+            Color.rgb(0, 190, 199),
+            Color.rgb(0, 105, 195),
+            Color.parseColor("#000080"),
+            Color.parseColor("#E4ED61"),
+            Color.parseColor("#F0FFFF"),
+            Color.parseColor("#43C6DB"),
+            Color.parseColor("#667C26"),
+            Color.parseColor("#52D017"),
+            Color.parseColor("#9617D1"),
+            Color.parseColor("#FFFF00"),
+            Color.parseColor("#FFD801"),
+            Color.parseColor("#AF7817"),
+            Color.parseColor("#173180"),
+            Color.parseColor("#6F4E37"),
+            Color.parseColor("#2D6580"),
+            Color.parseColor("#FF8040"),
+            Color.parseColor("#40BFFF"),
+            Color.parseColor("#FF0000"),
+            Color.parseColor("#8C001A"),
+            Color.parseColor("#058246"),
+            Color.parseColor("#F6358A"),
+            Color.rgb(0, 24, 191)};
+
+    static int deviceId;
+    public static HashMap<Integer,Integer> colorMap = new HashMap<>();
+
+    static Boolean flag = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        background = (LinearLayout)findViewById(R.id.background);
+
+        deviceId = 1;
+
         button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                flag = false;
                 Intent i = new Intent(MainActivity.this, RingdroidSelectActivity.class);
                 startActivity(i);
             }
         });
+
+        for (int i=0;i<20;i++)
+            colorMap.put(i, colors[i]);
 
         Intent intent = getIntent();
 
@@ -161,7 +210,7 @@ public class MainActivity extends Activity {
     private Socket mSocket;
     {
         try {
-            mSocket = IO.socket("http://10.1.2.25:3000/");
+            mSocket = IO.socket("http://akshayb.housing.com:3000/");
         } catch (URISyntaxException e) {}
     }
 
@@ -175,31 +224,33 @@ public class MainActivity extends Activity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    if (!flag) {
 
-                    JSONObject data = (JSONObject) args[0];
-                    ArrayList<Integer> amplitudes = new ArrayList<Integer>();
-                    double epoch;
-                    int[] values;
-                    try {
-                        int deviceId = 1;
+                        JSONObject data = (JSONObject) args[0];
+                        amplitudes = new ArrayList<Integer>();
+                        double epoch;
+                        int[] values;
+                        try {
+                            flag = true;
+                            epoch = data.getDouble("epoch");
+                            String j = data.getString("message");
+                            JSONArray jsonArray = new JSONArray(j);
 
-                        epoch = data.getDouble("epoch");
-                        JSONArray jsonArray = data.getJSONArray("message");
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                int ampl = jsonArray.getInt(i);
+                                amplitudes.add(ampl);
+                            }
 
-                        for (int i=0; i<jsonArray.length(); i++) {
-                            int ampl = jsonArray.getInt(i);
-                            amplitudes.add(ampl);
-                        }
-                        for (int i=0;i<10;i++)
-                            RecordingLevelSampleActivity.colorMap.put(i, RecordingLevelSampleActivity.colors[i]);
+                            Date date = new Date(Double.doubleToLongBits(epoch));
 
+                            runh();
 
-                        int colorId, colorMapVal;
-                        for (int k=0;k<amplitudes.size();k++){
-                            colorId = (deviceId + amplitudes.get(k)) % 20;
-                            colorMapVal = RecordingLevelSampleActivity.colorMap.get(colorId);
-                        }
-                        Log.e("loggg","logg");
+                            //Now create the time and schedule it
+//                        Timer timer = new Timer();
+//
+//                        //Use this if you want to execute it once
+//                        timer.schedule(new MyTimeTask(), date);
+
 
                         } catch (JSONException e) {
                             return;
@@ -214,8 +265,9 @@ public class MainActivity extends Activity {
 //                            }
 //                        });
 //                    }
-                    // add the message to view
-                    System.out.println("the data back is: " + data.toString());
+                        // add the message to view
+                        System.out.println("the data back is: " + data.toString());
+                    }
                 }
             });
         }
@@ -531,7 +583,7 @@ public class MainActivity extends Activity {
         mSocket.off("new message", onNewMessage);
     }
 
-    void play(String path){
+    static void play(String path){
         MediaPlayer mp = new MediaPlayer();
         try {
             mp.setDataSource(filePath);
@@ -542,5 +594,47 @@ public class MainActivity extends Activity {
         }
     }
 
+    private class MyTimeTask extends TimerTask
+    {
+
+        public void run()
+        {
+
+        }
+    }
+
+    void runh(){
+        if(master)
+            play("");
+
+
+        Runnable ru = new Runnable(){
+            public void run(){
+                int k = 0;
+                while(true){
+                    try{
+                        if(k >= amplitudes.size())
+                            break;
+                        final int colorId = (deviceId + amplitudes.get(k)) % 20;
+                        final int colorMapVal = colorMap.get(colorId);
+                        runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        background.setBackgroundColor(colorMapVal);
+                                    }
+                        });
+                        k = k+17;
+                        Thread.sleep(200);
+
+                    } catch (InterruptedException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        Thread thread = new Thread(ru);
+        thread.start();
+    }
 
 }
