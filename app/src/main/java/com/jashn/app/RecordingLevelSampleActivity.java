@@ -1,15 +1,17 @@
 package com.jashn.app;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.format.Time;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ProgressBar;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.ringdroid.R;
@@ -23,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.HashMap;
 
 public class RecordingLevelSampleActivity extends Activity {
 
@@ -34,16 +37,38 @@ public class RecordingLevelSampleActivity extends Activity {
 	private final String startRecordingLabel = "Start recording";
 	private final String stopRecordingLabel = "Stop recording";
 	private boolean mIsRecording = false;
-	private ProgressBar mProgressBar;
+//	private ProgressBar mProgressBar;
+    private double aDouble = 0;
+    private int deviceId = 0;
+    private LinearLayout background;
+    private int[] colors = {Color.rgb(229, 31, 0),
+            Color.rgb(220, 213, 0),
+            Color.rgb(224, 124, 0),
+            Color.rgb(42, 212, 0),
+            Color.rgb(0, 207, 44),
+            Color.rgb(133, 216, 0),
+            Color.rgb(0, 203, 128),
+            Color.rgb(0, 190, 199),
+            Color.rgb(0, 105, 195),
+            Color.rgb(0, 24, 191)};
+
+    private HashMap<Integer,Integer> colorMap = new HashMap<>();
 
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		initRecorder();
+        background = (LinearLayout)findViewById(R.id.background);
 
-		mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+        deviceId = 1+(int)Math.random() * 10;
+
+        for (int i=0;i<10;i++)
+            colorMap.put(i, colors[i]);
+
+        initRecorder();
+
+//		mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 		final Button button = (Button) findViewById(R.id.button);
 		button.setText(startRecordingLabel);
@@ -58,10 +83,11 @@ public class RecordingLevelSampleActivity extends Activity {
 					mRecording = getFile("raw");
 					startBufferedWrite(mRecording);
 				}
-//				else {
-//					button.setText(startRecordingLabel);
-//					mIsRecording = false;
-//					mRecorder.stop();
+				else {
+					button.setText(startRecordingLabel);
+					mIsRecording = false;
+					mRecorder.stop();
+                    Log.e("aDouble", aDouble + "");
 //					File waveFile = getFile("wav");
 //					try {
 //						rawToWave(mRecording, waveFile);
@@ -70,7 +96,7 @@ public class RecordingLevelSampleActivity extends Activity {
 //					}
 //					Toast.makeText(RecordingLevelSampleActivity.this, "Recorded to " + waveFile.getName(),
 //							Toast.LENGTH_SHORT).show();
-//				}
+				}
 			}
 		});
 	}
@@ -90,6 +116,7 @@ public class RecordingLevelSampleActivity extends Activity {
 	}
 
 	private void startBufferedWrite(final File file) {
+
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -105,13 +132,30 @@ public class RecordingLevelSampleActivity extends Activity {
 						}
 						if (readSize > 0) {
 							final double amplitude = sum / readSize;
-							mProgressBar.setProgress((int) Math.sqrt(amplitude));
+							int a = (int) Math.sqrt(amplitude);
+							if(a > 2000) {
+                                if(a > aDouble)
+                                    aDouble = a;
+								Log.e("dekho", amplitude + " " + a + "");
+                                final int colorId = (deviceId * (a / 2000)) % 10;
+                                Log.e("hhh", colorId+","+deviceId);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        background.setBackgroundColor(colorMap.get(colorId));
+                                    }
+                                });
+//								mProgressBar.setProgress((int) (Math.sqrt(amplitude)));
+							}
+							else {
+//								mProgressBar.setProgress((int) (0));
+							}
 						}
 					}
 				} catch (IOException e) {
 					Toast.makeText(RecordingLevelSampleActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 				} finally {
-					mProgressBar.setProgress(0);
+//					mProgressBar.setProgress(0);
 					if (output != null) {
 						try {
 							output.flush();
