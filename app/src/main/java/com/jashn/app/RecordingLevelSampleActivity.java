@@ -34,12 +34,12 @@ public class RecordingLevelSampleActivity extends Activity {
 	private AudioRecord mRecorder;
 	private File mRecording;
 	private short[] mBuffer;
-	private final String startRecordingLabel = "Start recording";
-	private final String stopRecordingLabel = "Stop recording";
+	private final String startRecordingLabel = "Connect";
+	private final String stopRecordingLabel = "Disconnect";
 	private boolean mIsRecording = false;
 //	private ProgressBar mProgressBar;
     private double aDouble = 0;
-    private int deviceId = 0;
+    private int deviceId = 1;
     private LinearLayout background;
     private int[] colors = {Color.rgb(229, 31, 0),
             Color.rgb(220, 213, 0),
@@ -51,20 +51,47 @@ public class RecordingLevelSampleActivity extends Activity {
             Color.rgb(0, 190, 199),
             Color.rgb(0, 105, 195),
             Color.rgb(0, 24, 191)};
+    private int[] colors_narrow = {Color.parseColor("#E5E4E2"),
+            Color.parseColor("#000080"),
+            Color.parseColor("#E4ED61"),
+            Color.parseColor("#F0FFFF"),
+            Color.parseColor("#43C6DB"),
+            Color.parseColor("#667C26"),
+            Color.parseColor("#52D017"),
+            Color.parseColor("#9617D1"),
+            Color.parseColor("#FFFF00"),
+            Color.parseColor("#FFD801"),
+            Color.parseColor("#AF7817"),
+            Color.parseColor("#173180"),
+            Color.parseColor("#6F4E37"),
+            Color.parseColor("#2D6580"),
+            Color.parseColor("#FF8040"),
+            Color.parseColor("#40BFFF"),
+            Color.parseColor("#FF0000"),
+            Color.parseColor("#8C001A"),
+            Color.parseColor("#058246"),
+            Color.parseColor("#F6358A"),
+            Color.parseColor("#4B0082")
+            };
 
     private HashMap<Integer,Integer> colorMap = new HashMap<>();
+    private HashMap<Integer,Integer> colorMap1 = new HashMap<>();
 
-	@Override
+
+    @Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
         background = (LinearLayout)findViewById(R.id.background);
 
-        deviceId = 1+(int)Math.random() * 10;
+//        deviceId = 1+(int)(Math.random() * 10);
 
         for (int i=0;i<10;i++)
             colorMap.put(i, colors[i]);
+
+        for (int i=0;i<20;i++)
+            colorMap1.put(i, colors_narrow[i]);
 
         initRecorder();
 
@@ -74,19 +101,18 @@ public class RecordingLevelSampleActivity extends Activity {
 		button.setText(startRecordingLabel);
 
 		button.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(final View v) {
-				if (!mIsRecording) {
-					button.setText(stopRecordingLabel);
-					mIsRecording = true;
-					mRecorder.startRecording();
-					mRecording = getFile("raw");
-					startBufferedWrite(mRecording);
-				}
-				else {
-					button.setText(startRecordingLabel);
-					mIsRecording = false;
-					mRecorder.stop();
+            @Override
+            public void onClick(final View v) {
+                if (!mIsRecording) {
+                    button.setText(stopRecordingLabel);
+                    mIsRecording = true;
+                    mRecorder.startRecording();
+                    mRecording = getFile("raw");
+                    startBufferedWrite(mRecording);
+                } else {
+                    button.setText(startRecordingLabel);
+                    mIsRecording = false;
+                    mRecorder.stop();
                     Log.e("aDouble", aDouble + "");
 //					File waveFile = getFile("wav");
 //					try {
@@ -96,9 +122,9 @@ public class RecordingLevelSampleActivity extends Activity {
 //					}
 //					Toast.makeText(RecordingLevelSampleActivity.this, "Recorded to " + waveFile.getName(),
 //							Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
+                }
+            }
+        });
 	}
 
 	@Override
@@ -137,12 +163,21 @@ public class RecordingLevelSampleActivity extends Activity {
                                 if(a > aDouble)
                                     aDouble = a;
 								Log.e("dekho", amplitude + " " + a + "");
-                                final int colorId = (deviceId * (a / 2000)) % 10;
+                                final int colorId, colorMapVal;
+                                if(a>8000 && a<16000)
+                                {
+                                    colorId = (deviceId + (a / 400)) % 20;
+                                    colorMapVal = colorMap1.get(colorId);
+                                } else{
+                                    colorId = (deviceId + (a / 2000)) % 10;
+                                    colorMapVal = colorMap.get(colorId);
+                                }
+
                                 Log.e("hhh", colorId+","+deviceId);
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        background.setBackgroundColor(colorMap.get(colorId));
+                                        background.setBackgroundColor(colorMapVal);
                                     }
                                 });
 //								mProgressBar.setProgress((int) (Math.sqrt(amplitude)));
