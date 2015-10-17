@@ -219,7 +219,7 @@ public class MainActivity extends Activity {
         computeDoublesForAllZoomLevels();
         computeIntsForThisZoomLevel();
         Log.e("array", mHeightsAtThisZoomLevel.toString());
-//        computeFFT(bytes);
+        computeFFT(bytes);
     }
 
     private void computeDoublesForAllZoomLevels() {
