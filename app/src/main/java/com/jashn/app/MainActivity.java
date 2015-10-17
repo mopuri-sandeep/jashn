@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -25,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 
@@ -95,13 +97,16 @@ public class MainActivity extends Activity {
     private Thread mLoadSoundFileThread;
     private Thread mRecordAudioThread;
     private Thread mSaveSoundFileThread;
+    private Boolean master = false;
+    Button button;
+    String filePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button button = (Button) findViewById(R.id.button);
+        button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -114,6 +119,10 @@ public class MainActivity extends Activity {
 
         if(intent.hasExtra("was_get_content_intent")) {
 
+            filePath = intent.getStringExtra("filename");
+
+            master = true;
+
             mWasGetContentIntent = intent.getBooleanExtra("was_get_content_intent", false);
 
             mFilename = intent.getData().toString().replaceFirst("file://", "").replaceAll("%20", " ");
@@ -123,9 +132,9 @@ public class MainActivity extends Activity {
             loadFromFile();
         }
 
-        mSocket.on("new message", onNewMessage);
+        mSocket.on("data", onNewMessage);
         mSocket.connect();
-        mSocket.emit("new message", "hahaahah testign");
+//        mSocket.emit("new message", "hahaahah testign");
 
 //        mWaveformView = (WaveformView)findViewById(R.id.waveform);
 //        mWaveformView.setListener(this);
@@ -151,8 +160,8 @@ public class MainActivity extends Activity {
         } catch (URISyntaxException e) {}
     }
 
-    private void attemptSend(String message) {
-        mSocket.emit("new message", message);
+    private void attemptSend(String event,String message) {
+        mSocket.emit(event, message);
     }
 
     private Emitter.Listener onNewMessage = new Emitter.Listener() {
@@ -171,6 +180,15 @@ public class MainActivity extends Activity {
 //                        return;
 //                    }
 
+//                    if(master){
+//                        button.setText("Play in sync");
+//                        button.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+//                                attemptSend("play", "play");
+//                            }
+//                        });
+//                    }
                     // add the message to view
                     System.out.println("the data back is: " + data.toString());
                 }
@@ -398,7 +416,7 @@ public class MainActivity extends Activity {
             }
         }
 
-        attemptSend(jsonArray.toString());
+        attemptSend("data",jsonArray.toString());
     }
 
     private long getCurrentTime() {
@@ -487,4 +505,17 @@ public class MainActivity extends Activity {
         mSocket.disconnect();
         mSocket.off("new message", onNewMessage);
     }
+
+    void play(String path){
+        MediaPlayer mp = new MediaPlayer();
+        try {
+            mp.setDataSource(filePath);
+            mp.prepare();
+            mp.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

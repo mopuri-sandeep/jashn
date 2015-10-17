@@ -470,6 +470,7 @@ public class RingdroidSelectActivity
         String filename = c.getString(dataIndex);
         try {
             Intent intent = new Intent(Intent.ACTION_EDIT, Uri.parse(filename));
+            intent.putExtra("filename", filename);
             intent.putExtra("was_get_content_intent", mWasGetContentIntent);
             intent.setClassName( "com.jashn.app", "com.jashn.app.MainActivity");
             startActivityForResult(intent, REQUEST_CODE_EDIT);
