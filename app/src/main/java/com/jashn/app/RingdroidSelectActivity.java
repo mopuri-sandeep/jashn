@@ -102,9 +102,9 @@ public class RingdroidSelectActivity
             return;
         }
 
-        Intent intent = getIntent();
-        mWasGetContentIntent = intent.getAction().equals(
-                Intent.ACTION_GET_CONTENT);
+//        Intent intent = getIntent();
+//        mWasGetContentIntent = intent.getAction().equals(
+//                Intent.ACTION_GET_CONTENT);
 
         // Inflate our UI from its XML layout description.
         setContentView(R.layout.media_select);

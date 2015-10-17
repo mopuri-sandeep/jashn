@@ -6,22 +6,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
 
-    <TextView android:text="Hello World!" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button"
+        android:text="Upload Song"/>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
-
-        <com.example.sakshiudeshi.myapplication.CircleView
-            android:id="@+id/my_circle1"
-            android:layout_width="20dp"
-            android:layout_height="20dp"/>
-        <com.example.sakshiudeshi.myapplication.CircleView
-            android:id="@+id/my_circle2"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"/>
-    </FrameLayout>
 </RelativeLayout>

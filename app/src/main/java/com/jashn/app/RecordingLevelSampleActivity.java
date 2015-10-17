@@ -2,7 +2,6 @@ package com.jashn.app;
 
 import android.app.Activity;
 import android.graphics.Color;
-import android.hardware.Camera;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -227,7 +226,7 @@ public class RecordingLevelSampleActivity extends Activity {
         animation.setDuration(200);
         animation.setFillAfter(true);
 
-        findViewById(R.id.my_circle1).startAnimation(animation);
+//        findViewById(R.id.my_circle1).startAnimation(animation);
     }
 
 	private void rawToWave(final File rawFile, final File waveFile) throws IOException {

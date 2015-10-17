@@ -8,15 +8,24 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.WindowManager;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 import com.jashn.app.wave.WaveformView;
 import com.jashn.app.wave.soundfile.SoundFile;
 import com.ringdroid.R;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 
 public class MainActivity extends Activity {
@@ -90,17 +99,33 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
+
+        Button button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, RingdroidSelectActivity.class);
+                startActivity(i);
+            }
+        });
 
         Intent intent = getIntent();
 
-        mWasGetContentIntent = intent.getBooleanExtra("was_get_content_intent", false);
+        if(intent.hasExtra("was_get_content_intent")) {
 
-        mFilename = intent.getData().toString().replaceFirst("file://", "").replaceAll("%20", " ");
-        mSoundFile = null;
-        mHandler = new Handler();
+            mWasGetContentIntent = intent.getBooleanExtra("was_get_content_intent", false);
 
-        loadFromFile();
+            mFilename = intent.getData().toString().replaceFirst("file://", "").replaceAll("%20", " ");
+            mSoundFile = null;
+            mHandler = new Handler();
+
+            loadFromFile();
+        }
+
+        mSocket.on("new message", onNewMessage);
+        mSocket.connect();
+        mSocket.emit("new message", "hahaahah testign");
 
 //        mWaveformView = (WaveformView)findViewById(R.id.waveform);
 //        mWaveformView.setListener(this);
@@ -118,6 +143,40 @@ public class MainActivity extends Activity {
 //            mMaxPos = mWaveformView.maxPos();
 //        }
     }
+
+    private Socket mSocket;
+    {
+        try {
+            mSocket = IO.socket("http://10.1.2.25:3000/");
+        } catch (URISyntaxException e) {}
+    }
+
+    private void attemptSend(String message) {
+        mSocket.emit("new message", message);
+    }
+
+    private Emitter.Listener onNewMessage = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+//                    String username;
+//                    String message;
+//                    try {
+//                        username = data.getString("username");
+//                        message = data.getString("message");
+//                    } catch (JSONException e) {
+//                        return;
+//                    }
+
+                    // add the message to view
+                    System.out.println("the data back is: " + data.toString());
+                }
+            });
+        }
+    };
 
     private void loadFromFile() {
         mFile = new File(mFilename);
@@ -220,8 +279,8 @@ public class MainActivity extends Activity {
         byte[] bytes = new byte[buf.capacity()];
         computeDoublesForAllZoomLevels();
         computeIntsForThisZoomLevel();
-        Log.e("array", mHeightsAtThisZoomLevel.toString());
-        computeFFT(bytes);
+//        Log.e("array", mHeightsAtThisZoomLevel.toString());
+//        computeFFT(bytes);
     }
 
     private void computeDoublesForAllZoomLevels() {
@@ -326,11 +385,20 @@ public class MainActivity extends Activity {
 
     private void computeIntsForThisZoomLevel() {
         int halfHeight = 100;
-        mHeightsAtThisZoomLevel = new int[mLenByZoomLevel[mZoomLevel]];
-        for (int i = 0; i < mLenByZoomLevel[mZoomLevel]; i++) {
-            mHeightsAtThisZoomLevel[i] =
+        JSONArray jsonArray = new JSONArray();
+//        mHeightsAtThisZoomLevel = new int[mLenByZoomLevel[mZoomLevel]];
+        for (int i = 0; i < mLenByZoomLevel[mZoomLevel]-1; i++) {
+            int a  =
                     (int)(mValuesByZoomLevel[mZoomLevel][i] * halfHeight);
+            try {
+                jsonArray.put(i, a);
+            }
+            catch (JSONException e){
+
+            }
         }
+
+        attemptSend(jsonArray.toString());
     }
 
     private long getCurrentTime() {
@@ -410,5 +478,13 @@ public class MainActivity extends Activity {
         return (p4 - (p4 % FUZ_FACTOR)) * 100000000 + (p3 - (p3 % FUZ_FACTOR))
                 * 100000 + (p2 - (p2 % FUZ_FACTOR)) * 100
                 + (p1 - (p1 % FUZ_FACTOR));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        mSocket.disconnect();
+        mSocket.off("new message", onNewMessage);
     }
 }
