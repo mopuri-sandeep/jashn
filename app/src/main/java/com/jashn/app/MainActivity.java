@@ -10,12 +10,13 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import java.nio.ByteBuffer;
+
 import com.jashn.app.wave.WaveformView;
 import com.jashn.app.wave.soundfile.SoundFile;
 import com.ringdroid.R;
 
 import java.io.File;
+import java.nio.ByteBuffer;
 
 public class MainActivity extends Activity {
 
@@ -365,31 +366,31 @@ public class MainActivity extends Activity {
         //Log.e("path333", Integer.toString(3));
 
         // result is complex matrix obtained in previous step
-//        for (int t = 0; t < result.length; t++) {
-//            for (int freq = 40; freq < 300 ; freq++) {
-//                // Get the magnitude:
-//                double mag = Math.log(result[t][freq].abs() + 1);
-//
-//                // Find out which range we are in:
-//                int index = getIndex(freq);
-//
-//                // Save the highest magnitude and corresponding frequency:
-//                if (mag > highscores[t][index].abs()) {
-//                    points[t][index] = new Complex(freq, 0.0);
-//                }
-//            }
-//
-//            // form hash tag
-//            long h = hash((long) points[t][0].getRe(),(long) points[t][1].getRe(), (long) points[t][2].getRe(), (long) points[t][3].getRe());
-//        }
+        for (int t = 0; t < result.length; t++) {
+            for (int freq = 40; freq < 300 ; freq++) {
+                // Get the magnitude:
+                double mag = Math.log(result[t][freq].abs() + 1);
+
+                // Find out which range we are in:
+                int index = getIndex(freq);
+
+                // Save the highest magnitude and corresponding frequency:
+                if (mag > highscores[t][index].abs()) {
+                    points[t][index] = new Complex(freq, 0.0);
+                }
+            }
+
+            // form hash tag
+            long h = hash((long) points[t][0].getRe(),(long) points[t][1].getRe(), (long) points[t][2].getRe(), (long) points[t][3].getRe());
+        }
         //Log.e("path444", Integer.toString(3));
 
-//        for(int l=0;l<result.length; l++){
-//            for (int h=0; h<5;h++){
-//                Log.e("path", Double.toString(points[l][h].getRe()));
-//
-//            }
-//        }
+        for(int l=0;l<result.length; l++){
+            for (int h=0; h<4;h++){
+                Log.e("path", Double.toString(points[l][h].getRe()));
+
+            }
+        }
     }
         public final int[] RANGE = new int[] { 40, 80, 120, 180, 300 };
 
