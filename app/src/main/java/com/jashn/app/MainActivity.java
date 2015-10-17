@@ -10,7 +10,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
-
+import java.nio.ByteBuffer;
 import com.jashn.app.wave.WaveformView;
 import com.jashn.app.wave.soundfile.SoundFile;
 import com.ringdroid.R;
@@ -214,9 +214,12 @@ public class MainActivity extends Activity {
     }
 
     private void finishOpeningSoundFile() {
+        ByteBuffer buf = mSoundFile.getmDecodedBytes();
+        byte[] bytes = new byte[buf.capacity()];
         computeDoublesForAllZoomLevels();
         computeIntsForThisZoomLevel();
         Log.e("array", mHeightsAtThisZoomLevel.toString());
+//        computeFFT(bytes);
     }
 
     private void computeDoublesForAllZoomLevels() {
@@ -330,5 +333,80 @@ public class MainActivity extends Activity {
 
     private long getCurrentTime() {
         return System.nanoTime() / 1000000;
+    }
+
+    public void computeFFT(byte[] audio) {
+        //Log.e("path11111", Integer.toString(1));
+        int totalSize = audio.length;
+        int chunkSize = 128;
+        int sampledChunkSize = totalSize / 128;
+        Complex[][] result = new Complex[sampledChunkSize][];
+        float sampleRate = 44100;
+        int sampleSizeInBits = 16;
+        int channels = 1;          //mono
+        boolean signed = true;     //Indicates whether the data is signed or unsigned
+        boolean bigEndian = true;
+        //Log.e("path222", Integer.toString(2));
+
+        for (int j = 0; j < sampledChunkSize; j++) {
+            Complex[] complexArray = new Complex[chunkSize];
+
+            for (int i = 0; i < chunkSize; i++) {
+                complexArray[i] = new Complex(audio[(j * chunkSize) + i], 0.0);
+            }
+            //Log.d("pathfft", "FFT crash");
+            Log.d("path_in_funct",""+complexArray.length);
+
+            result[j] = FFT.fft1(complexArray);
+            //Log.d("path_next", "fft after");
+        }
+        Complex[][] points = new Complex[result.length][5];
+        Complex[][] highscores = new Complex[result.length][5];
+        //Log.e("path333", Integer.toString(3));
+
+        // result is complex matrix obtained in previous step
+//        for (int t = 0; t < result.length; t++) {
+//            for (int freq = 40; freq < 300 ; freq++) {
+//                // Get the magnitude:
+//                double mag = Math.log(result[t][freq].abs() + 1);
+//
+//                // Find out which range we are in:
+//                int index = getIndex(freq);
+//
+//                // Save the highest magnitude and corresponding frequency:
+//                if (mag > highscores[t][index].abs()) {
+//                    points[t][index] = new Complex(freq, 0.0);
+//                }
+//            }
+//
+//            // form hash tag
+//            long h = hash((long) points[t][0].getRe(),(long) points[t][1].getRe(), (long) points[t][2].getRe(), (long) points[t][3].getRe());
+//        }
+        //Log.e("path444", Integer.toString(3));
+
+//        for(int l=0;l<result.length; l++){
+//            for (int h=0; h<5;h++){
+//                Log.e("path", Double.toString(points[l][h].getRe()));
+//
+//            }
+//        }
+    }
+        public final int[] RANGE = new int[] { 40, 80, 120, 180, 300 };
+
+    // find out in which range is frequency
+    public int getIndex(int freq) {
+        int i = 0;
+        while (RANGE[i] < freq)
+            i++;
+        return i;
+    }
+
+
+    private static final int FUZ_FACTOR = 2;
+
+    private long hash(long p1, long p2, long p3, long p4) {
+        return (p4 - (p4 % FUZ_FACTOR)) * 100000000 + (p3 - (p3 % FUZ_FACTOR))
+                * 100000 + (p2 - (p2 % FUZ_FACTOR)) * 100
+                + (p1 - (p1 % FUZ_FACTOR));
     }
 }
