@@ -27,6 +27,9 @@ import org.json.JSONObject;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends Activity {
 
@@ -96,6 +99,8 @@ public class MainActivity extends Activity {
     private Thread mRecordAudioThread;
     private Thread mSaveSoundFileThread;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -161,15 +166,35 @@ public class MainActivity extends Activity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
                     JSONObject data = (JSONObject) args[0];
-//                    String username;
-//                    String message;
-//                    try {
-//                        username = data.getString("username");
-//                        message = data.getString("message");
-//                    } catch (JSONException e) {
-//                        return;
-//                    }
+                    ArrayList<Integer> amplitudes = new ArrayList<Integer>();
+                    double epoch;
+                    int[] values;
+                    try {
+                        int deviceId = 1;
+
+                        epoch = data.getDouble("epoch");
+                        JSONArray jsonArray = data.getJSONArray("message");
+
+                        for (int i=0; i<jsonArray.length(); i++) {
+                            int ampl = jsonArray.getInt(i);
+                            amplitudes.add(ampl);
+                        }
+                        for (int i=0;i<10;i++)
+                            RecordingLevelSampleActivity.colorMap.put(i, RecordingLevelSampleActivity.colors[i]);
+
+
+                        int colorId, colorMapVal;
+                        for (int k=0;k<amplitudes.size();k++){
+                            colorId = (deviceId + amplitudes.get(k)) % 20;
+                            colorMapVal = RecordingLevelSampleActivity.colorMap.get(colorId);
+                        }
+                        Log.e("loggg","logg");
+
+                        } catch (JSONException e) {
+                            return;
+                        }
 
                     // add the message to view
                     System.out.println("the data back is: " + data.toString());
