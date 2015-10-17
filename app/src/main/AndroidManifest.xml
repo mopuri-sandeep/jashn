@@ -74,6 +74,12 @@
             </intent-filter>
         </activity>
 
+        <permission android:name="android.permission.FLASHLIGHT"
+            android:permissionGroup="android.permission-group.HARDWARE_CONTROLS"
+            android:protectionLevel="normal"
+            android:label="@string/permlab_flashlight"
+            android:description="@string/permdesc_flashlight" />
+
         <!-- Activity for actually editing a particular audio file.
                  Controls viewing the waveform, setting the start and end
                  positions, playback, and triggering saving of the output

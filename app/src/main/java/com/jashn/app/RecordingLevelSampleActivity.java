@@ -2,6 +2,7 @@ package com.jashn.app;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.hardware.Camera;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -10,6 +11,8 @@ import android.os.Environment;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -41,12 +44,14 @@ public class RecordingLevelSampleActivity extends Activity {
     private double aDouble = 0;
     private int deviceId = 0;
     private LinearLayout background;
-    private int[] colors = {Color.rgb(229, 31, 0),
-            Color.rgb(220, 213, 0),
-            Color.rgb(224, 124, 0),
+    private int[] colors = {
+			Color.rgb(224, 124, 0),
             Color.rgb(42, 212, 0),
             Color.rgb(0, 207, 44),
-            Color.rgb(133, 216, 0),
+			Color.rgb(229, 31, 0),
+			Color.rgb(220, 213, 0),
+			Color.rgb(0, 105, 195),
+			Color.rgb(133, 216, 0),
             Color.rgb(0, 203, 128),
             Color.rgb(0, 190, 199),
             Color.rgb(0, 105, 195),
@@ -143,6 +148,14 @@ public class RecordingLevelSampleActivity extends Activity {
                                     @Override
                                     public void run() {
                                         background.setBackgroundColor(colorMap.get(colorId));
+//                                        Camera cam = Camera.open();
+//                                        Parameters p = cam.getParameters();
+//                                        p.setFlashMode(Parameters.FLASH_MODE_TORCH);
+//                                        cam.setParameters(p);
+//                                        cam.startPreview();
+                                        WindowManager.LayoutParams lp = getWindow().getAttributes();
+                                        lp.screenBrightness = (float)1.0;
+                                        getWindow().setAttributes(lp);
                                     }
                                 });
 //								mProgressBar.setProgress((int) (Math.sqrt(amplitude)));
@@ -175,6 +188,17 @@ public class RecordingLevelSampleActivity extends Activity {
 			}
 		}).start();
 	}
+
+    public void showBezier(View v, int initX, int limitX, int initY, int limitY) {
+        ArcTranslateAnimation animation = new ArcTranslateAnimation(
+                initX, limitX, initY, limitY);
+        animation
+                .setInterpolator(new LinearInterpolator());
+        animation.setDuration(200);
+        animation.setFillAfter(true);
+
+        findViewById(R.id.my_circle1).startAnimation(animation);
+    }
 
 	private void rawToWave(final File rawFile, final File waveFile) throws IOException {
 
