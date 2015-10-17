@@ -45,11 +45,7 @@
         <!-- Main activity that's launched when the user opens Ringdroid. -->
         <activity android:name="com.jashn.app.RingdroidSelectActivity"
             android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
 
             <intent-filter>
                 <action android:name="android.intent.action.GET_CONTENT" />
@@ -67,6 +63,14 @@
             <intent-filter android:label="@string/edit_intent">
                 <action android:name="android.intent.action.EDIT" />
                 <data android:mimeType="audio/*" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="com.jashn.app.RecordingLevelSampleActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
