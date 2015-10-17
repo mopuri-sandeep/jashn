@@ -43,7 +43,7 @@ public class RecordingLevelSampleActivity extends Activity {
     private double aDouble = 0;
     private int deviceId = 1;
     private LinearLayout background;
-    private int[] colors = {
+    public static int[] colors = {
 			Color.rgb(224, 124, 0),
             Color.rgb(42, 212, 0),
             Color.rgb(0, 207, 44),
@@ -54,8 +54,27 @@ public class RecordingLevelSampleActivity extends Activity {
             Color.rgb(0, 203, 128),
             Color.rgb(0, 190, 199),
             Color.rgb(0, 105, 195),
+			Color.parseColor("#000080"),
+			Color.parseColor("#E4ED61"),
+			Color.parseColor("#F0FFFF"),
+			Color.parseColor("#43C6DB"),
+			Color.parseColor("#667C26"),
+			Color.parseColor("#52D017"),
+			Color.parseColor("#9617D1"),
+			Color.parseColor("#FFFF00"),
+			Color.parseColor("#FFD801"),
+			Color.parseColor("#AF7817"),
+			Color.parseColor("#173180"),
+			Color.parseColor("#6F4E37"),
+			Color.parseColor("#2D6580"),
+			Color.parseColor("#FF8040"),
+			Color.parseColor("#40BFFF"),
+			Color.parseColor("#FF0000"),
+			Color.parseColor("#8C001A"),
+			Color.parseColor("#058246"),
+			Color.parseColor("#F6358A"),
             Color.rgb(0, 24, 191)};
-    private int[] colors_narrow = {Color.parseColor("#E5E4E2"),
+    public static int[] colors_narrow = {Color.parseColor("#E5E4E2"),
             Color.parseColor("#000080"),
             Color.parseColor("#E4ED61"),
             Color.parseColor("#F0FFFF"),
@@ -78,8 +97,8 @@ public class RecordingLevelSampleActivity extends Activity {
             Color.parseColor("#4B0082")
             };
 
-    private HashMap<Integer,Integer> colorMap = new HashMap<>();
-    private HashMap<Integer,Integer> colorMap1 = new HashMap<>();
+    public static HashMap<Integer,Integer> colorMap = new HashMap<>();
+    public static HashMap<Integer,Integer> colorMap1 = new HashMap<>();
 
 
     @Override
